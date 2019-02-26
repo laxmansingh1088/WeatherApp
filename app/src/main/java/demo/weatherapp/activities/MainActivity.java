@@ -2,6 +2,7 @@ package demo.weatherapp.activities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -78,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private LineChartView lineChartView;
     private BroadcastReceiver networkChangeReceiver;
 
+    ProgressDialog progressdialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,15 +119,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             networkChangeReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                   if(Utils.isNetworkAvailable(context))
-                    setUpGClient();
+                    if (Utils.isNetworkAvailable(context))
+                        setUpGClient();
                     checkPermissions();
                 }
             };
             IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
             registerReceiver(networkChangeReceiver, intentFilter);
         }
-
 
 
         viewModel = ViewModelProviders.of(this).get(WeatherForecastViewModel.class);
@@ -134,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             e.printStackTrace();
         }
         viewModel.getWeatherForecastModelLiveData().observe(this, WeatherForecastModel -> {
-
+            cancelProgressDialog();
             if (viewModel.getWeatherForecastModelLiveData().getValue() == null) {
                 Toast.makeText(MainActivity.this, "null data", Toast.LENGTH_LONG).show();
             } else {
@@ -184,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 percipation_val.setText(String.valueOf(todayWeather.getRainPercipitation()) + "mm");
             }
 
+            lineChartView.setVisibility(View.VISIBLE);
             adapter.setList(viewModel.getWeatherForecastModelLiveData().getValue().getListWeatherData());
             adapter.notifyDataSetChanged();
 
@@ -212,15 +215,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private synchronized void setUpGClient() {
-        if(googleApiClient==null) {
+        if (googleApiClient == null) {
             googleApiClient = new GoogleApiClient.Builder(this)
                     .enableAutoManage(this, 0, this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-           if(!googleApiClient.isConnected())
-            googleApiClient.connect();
+            if (!googleApiClient.isConnected())
+                googleApiClient.connect();
         }
     }
 
@@ -231,7 +234,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             Toast.makeText(MainActivity.this, mylocation.getLatitude() + " \n " + mylocation.getLongitude(), Toast.LENGTH_LONG).show();
             try {
                 if (Utils.isNetworkAvailable(MainActivity.this)) {
+                    if (Utils.getWeatherData(MainActivity.this) == null) {
+                        showProgress();
+                    }
                     viewModel.fetchWeatherInformation(MainActivity.this, mylocation.getLatitude(), mylocation.getLongitude());
+
                 } else {
                     Toast.makeText(MainActivity.this, getResources().getString(R.string.pls_check_internet), Toast.LENGTH_LONG).show();
                 }
@@ -418,4 +425,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (networkChangeReceiver != null)
             unregisterReceiver(networkChangeReceiver);
     }
+
+
+    private void showProgress() {
+        if (progressdialog == null) {
+            progressdialog = new ProgressDialog(this);
+            progressdialog.setMessage("Please Wait....");
+            progressdialog.setCancelable(false);
+            progressdialog.setCanceledOnTouchOutside(false);
+            progressdialog.show();
+        }
+    }
+
+    private void cancelProgressDialog() {
+        if (progressdialog != null) {
+            progressdialog.cancel();
+            progressdialog = null;
+        }
+    }
+
 }

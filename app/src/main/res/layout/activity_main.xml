@@ -71,7 +71,7 @@
                     android:layout_above="@+id/temp_min_max"
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
-                    android:text="29"
+                    android:text=""
                     android:textColor="@color/white"
                     android:textSize="50sp" />
 
@@ -83,7 +83,7 @@
                     android:paddingLeft="16dp"
                     android:paddingRight="16dp"
                     android:paddingBottom="10dp"
-                    android:text="Sunny"
+                    android:text=""
                     android:textColor="@color/white"
                     android:textSize="16sp" />
 
@@ -94,6 +94,7 @@
                 android:id="@+id/graph"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
+                android:visibility="gone"
                 android:layout_marginTop="50dp" />
 
             <View
