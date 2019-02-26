@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+    <string name="weather_api_key">3e1b366c9b86c00285f7927010786a66</string>
+    <string name="percipitation_probab">Probability of percipitation</string>
+    <string name="percipitation">Percipitation</string>
+    <string name="wind">Wind</string>
+    <string name="perceived_temp">Perceived temperature</string>
+    <string name="humidity">Humidity</string>
+    <string name="visibility">Visibility</string>
+    <string name="uv">UV</string>
+    <string name="pressure">Pressure</string>
+    <string name="pls_check_internet">Please check your internet connection.</string>
+</resources>
